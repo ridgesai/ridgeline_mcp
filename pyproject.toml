@@ -1,0 +1,29 @@
+[project]
+name = "ridgeline-mcp"
+version = "0.1.0"
+description = "MCP server bridging AI agents and the Ridgeline platform."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]",
+    "httpx",
+    "eth-account",
+    "x402[evm]",
+]
+
+[project.scripts]
+ridgeline-mcp = "main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ridgeline"]
+include = ["main.py"]
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
