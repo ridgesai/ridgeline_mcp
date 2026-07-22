@@ -14,6 +14,9 @@ Lets an MCP-host agent (Claude Code, Cursor, …) interact with the Ridgeline pl
 
 ## Requirements
 
+- Python 3.10 or newer.
+- [uv](https://docs.astral.sh/uv/) to install dependencies and run the server
+  (`uv sync`, then `uv run ridgeline-mcp`).
 - The Ridgeline GitHub App must be installed on the target repository.
 - The wallet must hold USDC on the configured network (Base or Base Sepolia).
 
