@@ -38,8 +38,12 @@ Add to your MCP config:
   "mcpServers": {
     "ridgeline": {
       "command": "uv",
-      "args": ["run", "ridgeline-mcp"],
-      "cwd": "/absolute/path/to/ridgeline_mcp",
+      "args": [
+        "run",
+        "--directory",
+        "/absolute/path/to/ridgeline_mcp",
+        "ridgeline-mcp"
+      ],
       "env": {
         "RIDGELINE_API_URL": "https://api.ridgeline.example",
         "WALLET_PRIVATE_KEY": "0x...",
@@ -49,6 +53,11 @@ Add to your MCP config:
   }
 }
 ```
+
+Use `uv run --directory <path>` rather than relying on a `cwd` field: the host may
+spawn the server from a different working directory, and `--directory` makes `uv`
+resolve this project regardless. `WALLET_PRIVATE_KEY` must be a 32-byte key
+(64 hex characters, `0x`-prefixed) — a 20-byte account address will fail to start.
 
 ## Security
 
