@@ -178,7 +178,7 @@ class PayingClient:
         Parameters
         ----------
         path : str
-            Path on the Ridgeline API, e.g. '/issues'.
+            Path on the Ridgeline API, e.g. '/v1/issues'.
         json : dict
             JSON request body.
 

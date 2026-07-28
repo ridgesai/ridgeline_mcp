@@ -47,7 +47,7 @@ async def create_issue(client: PayingClient, github_issue_url: str) -> dict:
         If the issue could not be created, with an agent-readable reason.
     """
     response = await client.post_with_payment(
-        "/issues", {"github_issue_url": github_issue_url}
+        "/v1/issues", {"github_issue_url": github_issue_url}
     )
 
     if response.status_code == 200:
