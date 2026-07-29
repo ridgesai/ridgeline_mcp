@@ -15,10 +15,29 @@ Lets an MCP-host agent (Claude Code, Cursor, …) interact with the Ridgeline pl
 ## Requirements
 
 - Python 3.10 or newer.
-- [uv](https://docs.astral.sh/uv/) to install dependencies and run the server
-  (`uv sync`, then `uv run ridgeline-mcp`).
-- The Ridgeline GitHub App must be installed on the target repository.
-- The wallet must hold USDC on the configured network (Base or Base Sepolia).
+- [uv](https://docs.astral.sh/uv/) to install dependencies and run the server.
+- The [Ridgeline GitHub App](https://github.com/apps/ridges-ai/installations/new)
+  must be installed on the target repository.
+- A wallet (its private key) holding USDC on the configured network (Base or
+  Base Sepolia). For testnet, fund the wallet with Base Sepolia USDC from a
+  faucet such as [faucet.circle.com](https://faucet.circle.com/).
+
+## Setup
+
+1. Clone the repo:
+
+   ```bash
+   git clone git@github.com:ridgesai/ridgeline_mcp.git
+   ```
+
+2. Install the [Ridgeline GitHub App](https://github.com/apps/ridges-ai/installations/new)
+   on the repository you want Ridgeline to open issues/PRs against.
+
+3. Add the server to your MCP host's config with the required environment
+   variables (see [Configuration](#configuration) and
+   [Claude Code setup](#claude-code-setup) below). `uv` installs dependencies
+   automatically the first time the host launches the server, so there's no
+   separate install step.
 
 ## Configuration
 
@@ -38,8 +57,12 @@ Add to your MCP config:
   "mcpServers": {
     "ridgeline": {
       "command": "uv",
-      "args": ["run", "ridgeline-mcp"],
-      "cwd": "/absolute/path/to/ridgeline_mcp",
+      "args": [
+        "run",
+        "--directory",
+        "/absolute/path/to/ridgeline_mcp",
+        "ridgeline-mcp"
+      ],
       "env": {
         "RIDGELINE_API_URL": "https://api.ridgeline.example",
         "WALLET_PRIVATE_KEY": "0x...",
@@ -49,6 +72,11 @@ Add to your MCP config:
   }
 }
 ```
+
+Use `uv run --directory <path>` rather than relying on a `cwd` field: the host may
+spawn the server from a different working directory, and `--directory` makes `uv`
+resolve this project regardless. `WALLET_PRIVATE_KEY` must be a 32-byte key
+(64 hex characters, `0x`-prefixed) — a 20-byte account address will fail to start.
 
 ## Security
 
