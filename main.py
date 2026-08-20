@@ -18,7 +18,7 @@ def build_server() -> FastMCP:
     server = FastMCP("Ridgeline")
 
     @server.tool()
-    async def create_issue(github_issue_url: str) -> dict:
+    async def create_issue(github_issue_url: str, branch: str | None = None) -> dict:
         """Create a Ridgeline issue from a GitHub issue URL, paying via x402.
 
         Ridgeline's AI agents will attempt to solve the issue and open a pull
@@ -30,6 +30,9 @@ def build_server() -> FastMCP:
         github_issue_url : str
             Full URL of the GitHub issue, e.g.
             'https://github.com/owner/repo/issues/123'.
+        branch : str or None, optional
+            Existing branch the work should be based on, e.g. 'develop'. Omit
+            to use the repository's default branch.
 
         Returns
         -------
@@ -37,7 +40,7 @@ def build_server() -> FastMCP:
             Keys: issue_id, origin, paid, tx_hash.
         """
         try:
-            return await tools.create_issue(client, github_issue_url)
+            return await tools.create_issue(client, github_issue_url, branch)
         except tools.ToolError as e:
             raise ValueError(str(e)) from e
 

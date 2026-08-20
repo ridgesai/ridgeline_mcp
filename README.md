@@ -24,11 +24,16 @@ funded wallet's private key up front, and why there's no manual "pay now" step.
 
 ## Tools
 
-- **`create_issue(github_issue_url)`** — creates a Ridgeline issue for an existing
-  GitHub issue, paying via x402. Returns `issue_id`, `origin`, `paid`, `tx_hash`.
+- **`create_issue(github_issue_url, branch=None)`** — creates a Ridgeline issue for
+  an existing GitHub issue, paying via x402. Returns `issue_id`, `origin`, `paid`,
+  `tx_hash`.
   Safe to retry: the API will not double-charge for the same issue. If the issue was already
   processed and you want to retry, you can call the tool again and after paying via X402,
-  the issue will be processed again
+  the issue will be processed again.
+  `branch` is optional: pass an existing branch name (e.g. `develop`) to base the
+  work on it, or omit it to use the repository's default branch. The branch must
+  already exist on the repo — the API rejects unknown branches. Ask your agent
+  something like *"open a Ridgeline issue for <url>, based on the develop branch"*.
 - **`wallet_balance()`** — reports the wallet's USDC balance, its address, and the
   network.
 
@@ -161,6 +166,12 @@ resolve this project regardless. `WALLET_PRIVATE_KEY` must be a 32-byte key
 **Server fails to start with a key-format error**
 - `WALLET_PRIVATE_KEY` must be `0x` followed by 64 hex characters (32 bytes). A
   wallet *address* (20 bytes, also `0x`-prefixed but shorter) will not work.
+
+**`create_issue` fails with a branch error**
+- The branch you passed doesn't exist on the repository — check the exact name
+  (branch names are case-sensitive), or omit `branch` to use the default branch.
+- If you omitted `branch` and still got this, the repo has no commits yet, so
+  there's no default branch to base an issue on. Push a commit first.
 
 **Payments keep failing, or you keep getting HTTP 402 back**
 - The wallet is probably unfunded on the network you configured — check with the

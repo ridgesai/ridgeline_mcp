@@ -25,7 +25,9 @@ def _detail(response: PaidResponse, fallback: str) -> str:
     return detail if isinstance(detail, str) and detail else fallback
 
 
-async def create_issue(client: PayingClient, github_issue_url: str) -> dict:
+async def create_issue(
+    client: PayingClient, github_issue_url: str, branch: str | None = None
+) -> dict:
     """Create a Ridgeline issue for a GitHub issue, paying via x402 if required.
 
     Parameters
@@ -35,6 +37,9 @@ async def create_issue(client: PayingClient, github_issue_url: str) -> dict:
     github_issue_url : str
         Full URL of the GitHub issue, e.g.
         'https://github.com/owner/repo/issues/123'.
+    branch : str or None, optional
+        Branch to base the work on. Defaults to the repository's default
+        branch when omitted.
 
     Returns
     -------
@@ -46,9 +51,11 @@ async def create_issue(client: PayingClient, github_issue_url: str) -> dict:
     ToolError
         If the issue could not be created, with an agent-readable reason.
     """
-    response = await client.post_with_payment(
-        "/v1/issues", {"github_issue_url": github_issue_url}
-    )
+    payload: dict = {"github_issue_url": github_issue_url}
+    if branch:
+        payload["branch"] = branch
+
+    response = await client.post_with_payment("/v1/issues", payload)
 
     if response.status_code == 200:
         return {
@@ -71,7 +78,7 @@ async def create_issue(client: PayingClient, github_issue_url: str) -> dict:
         raise ToolError(_detail(response, "Repository or issue not found."))
 
     if response.status_code == 422:
-        raise ToolError(_detail(response, "Invalid GitHub issue URL."))
+        raise ToolError(_detail(response, "Invalid GitHub issue URL or branch."))
 
     if response.status_code == 429:
         raise ToolError("Rate limited by the Ridgeline API. Wait a minute and retry.")
