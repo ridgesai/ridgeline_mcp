@@ -26,7 +26,10 @@ def _detail(response: PaidResponse, fallback: str) -> str:
 
 
 async def create_issue(
-    client: PayingClient, github_issue_url: str, branch: str | None = None
+    client: PayingClient,
+    github_issue_url: str,
+    branch: str | None = None,
+    retry: bool = False,
 ) -> dict:
     """Create a Ridgeline issue for a GitHub issue, paying via x402 if required.
 
@@ -40,18 +43,22 @@ async def create_issue(
     branch : str or None, optional
         Branch to base the work on. Defaults to the repository's default
         branch when omitted.
+    retry : bool, optional
+        Request a paid re-run of an issue that already exists. Ignored when
+        the issue does not exist yet. Left false, an existing issue is never
+        charged for again.
 
     Returns
     -------
     dict
-        Keys: issue_id, origin, paid, tx_hash.
+        Keys: issue_id, origin, outcome, retry_available, paid, tx_hash.
 
     Raises
     ------
     ToolError
         If the issue could not be created, with an agent-readable reason.
     """
-    payload: dict = {"github_issue_url": github_issue_url}
+    payload: dict = {"github_issue_url": github_issue_url, "retry": retry}
     if branch:
         payload["branch"] = branch
 
@@ -61,6 +68,8 @@ async def create_issue(
         return {
             "issue_id": response.body.get("issue_id"),
             "origin": response.body.get("origin"),
+            "outcome": response.body.get("outcome"),
+            "retry_available": bool(response.body.get("retry_available", False)),
             "paid": response.paid,
             "tx_hash": response.tx_hash,
         }

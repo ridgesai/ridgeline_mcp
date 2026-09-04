@@ -24,12 +24,13 @@ funded wallet's private key up front, and why there's no manual "pay now" step.
 
 ## Tools
 
-- **`create_issue(github_issue_url, branch=None)`** — creates a Ridgeline issue for
-  an existing GitHub issue, paying via x402. Returns `issue_id`, `origin`, `paid`,
-  `tx_hash`.
-  Safe to retry: the API will not double-charge for the same issue. If the issue was already
-  processed and you want to retry, you can call the tool again and after paying via X402,
-  the issue will be processed again.
+- **`create_issue(github_issue_url, branch=None, retry=False)`** — creates a Ridgeline
+  issue for an existing GitHub issue, paying via x402. Returns `issue_id`, `origin`,
+  `outcome`, `retry_available`, `paid`, `tx_hash`.
+  Safe to repeat: if the issue already exists, the call returns `outcome: "existing"`
+  without charging the wallet. Re-running a finished issue is opt-in — when the response
+  comes back with `retry_available: true`, call the tool again with `retry=true` to pay
+  for a fresh run. Ask your agent something like *"re-run the Ridgeline issue for <url>"*.
   `branch` is optional: pass an existing branch name (e.g. `develop`) to base the
   work on it, or omit it to use the repository's default branch. The branch must
   already exist on the repo — the API rejects unknown branches. Ask your agent
